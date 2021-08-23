@@ -2,9 +2,7 @@
 
 [the WeChat Message Cryptography](https://open.weixin.qq.com/cgi-bin/showdocument?action=dir_list&t=resource/res_list&verify=1&id=open1419318482&lang=zh_CN) in the openresty lua verison.
 
-## aes_pad.lua
-
-extend the [aes.lua](https://github.com/openresty/lua-resty-string) with a `set_padding` method, [discussing here](https://github.com/openresty/lua-resty-string/pull/35)
+use the [aes.lua](https://github.com/openresty/lua-resty-string) with a `enable_padding` method, [PR here](https://github.com/openresty/lua-resty-string/pull/85)
 
 ## crypt.lua
 

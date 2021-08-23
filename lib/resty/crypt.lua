@@ -1,13 +1,13 @@
 local random = require "resty.random"
 local str = require "resty.string"
-local aes = require "resty.aes_pad"
+local aes = require "resty.aes"
 local bit = require "bit"
 local resty_sha1 = require "resty.sha1"
 local setmetatable, assert = setmetatable, assert
 local str_char, str_sub, str_byte, str_format = string.char, string.sub, string.byte, string.format
 local decode_base64, encode_base64 = ngx.decode_base64, ngx.encode_base64
 
-local _M = { _VERSION = '0.2' }
+local _M = { _VERSION = '0.3' }
 
 local mt = { __index = _M }
 
@@ -76,10 +76,11 @@ function _M.decrypt (self, encrypted)
         return nil
     end
 
+    local enable_padding = false
     local aes_crypt = assert(
-        aes:new(self.aes_key, nil, self.cipher, {iv = self.iv})
+        aes:new(self.aes_key, nil, self.cipher, {iv = self.iv}, nil,
+        nil, enable_padding)
     )
-    aes_crypt:set_padding(0)
 
     local text = aes_crypt:decrypt(ciphertext_dec)
     text = pkcs7_decode(str_sub(text, 17, #text))
@@ -95,10 +96,11 @@ function _M.encrypt (self, text, timestamp, nonce)
     text = prefix .. pack_text_len(#text) .. text .. self.app_id
     text = pkcs7_encode(text)
 
+    local enable_padding = false
     local aes_crypt = assert(
-        aes:new(self.aes_key, nil, self.cipher, {iv = self.iv})
+        aes:new(self.aes_key, nil, self.cipher, {iv = self.iv}, nil,
+        nil, enable_padding)
     )
-    aes_crypt:set_padding(0)
 
     local encrypted = encode_base64(aes_crypt:encrypt(text))
     local signature = self:get_sha1({self.token, timestamp, nonce, encrypted})
